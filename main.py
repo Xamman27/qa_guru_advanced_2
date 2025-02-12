@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 from data import users, support_info, user_passwords
 from secrets import token_hex
 from models.models import *
+from fastapi_pagination import Page, add_pagination, paginate
 
 app = FastAPI()
 
@@ -17,6 +18,13 @@ def get_user(user_id: int):
         )
 
     return UserResponse(data=user, support=support_info)
+
+
+@app.get("/api/users/", response_model=Page[UserData])
+def get_users():
+    user_list = [UserData(**user) for user in users.values()]
+    return paginate(user_list)
+
 
 @app.post("/api/login", response_model=SuccessRegisterData)
 def login(user_data: LoginRequest):
@@ -33,6 +41,8 @@ def login(user_data: LoginRequest):
     random_token = token_hex(16)
     return SuccessRegisterData(id=user['id'], token=random_token)
 
+
+add_pagination(app)
 
 if __name__ == "__main__":
     import uvicorn
