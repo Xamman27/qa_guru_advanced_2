@@ -23,3 +23,6 @@ class SuccessRegisterData(BaseModel):
 class LoginRequest(BaseModel):
     email: str
     password: str
+
+class AppStatus(BaseModel):
+    users: bool

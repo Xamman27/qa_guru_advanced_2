@@ -7,6 +7,10 @@ from fastapi_pagination import Page, add_pagination, paginate
 
 app = FastAPI()
 
+@app.get('/api/status', response_model=AppStatus)
+def get_status():
+    return AppStatus(users=bool(users))
+
 
 @app.get("/api/users/{user_id}", response_model=UserResponse)
 def get_user(user_id: int):

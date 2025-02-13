@@ -1,10 +1,13 @@
 import requests
 import pytest
 
+def test_service_status(base_url):
+    response = requests.get(f'{base_url}/status')
+    assert response.json()['users']
 
 @pytest.mark.parametrize("user_id, email",[(2, "janet.weaver@reqres.in")])
-def test_user_data(user_id, email):
-    url = f"http://0.0.0.0:8000/api/users/{user_id}"
+def test_user_data(base_url, user_id, email):
+    url = f"{base_url}/users/{user_id}"
     try:
         response = requests.get(url)
         assert response.status_code == 200, f"Expected status code 200, but got {response.status_code}"
@@ -19,10 +22,10 @@ def test_user_data(user_id, email):
     except Exception as err:
         pytest.fail(f"Other error occurred: {err}")
 
-@pytest.mark.parametrize("email, password", [("george.bluth@reqres.in", "password123"),
-                                             ("janet.weaver@reqres.in", "password456")])
-def test_login(email, password):
-    url = f"http://0.0.0.0:8000/api/login"
+@pytest.mark.parametrize("email, password", [("george.bluth@reqres.in", "password1"),
+                                             ("janet.weaver@reqres.in", "password2")])
+def test_login(base_url, email, password):
+    url = f"{base_url}/login"
     json = {
         "email": email,
         "password": password
@@ -34,8 +37,8 @@ def test_login(email, password):
 
 
 @pytest.mark.parametrize("email", ["george.bluth@reqres.in"])
-def test_login_missing_password(email):
-    url = f"http://0.0.0.0:8000/api/login"
+def test_login_missing_password(base_url, email):
+    url = f"{base_url}/login"
     json = {"email": email, "password": ""}
     response = requests.post(url, json=json)
     print(response.json())
@@ -45,8 +48,8 @@ def test_login_missing_password(email):
 
 @pytest.mark.parametrize("email, password", [("georg.bluth@reqres.in", "password123"),
                                              ("jane.weaver@reqres.in", "password456")])
-def test_user_not_found(email, password):
-    url = f"http://0.0.0.0:8000/api/login"
+def test_user_not_found(base_url ,email, password):
+    url = f"{base_url}/login"
     json = {"email": email, "password": password}
     response = requests.post(url, json=json)
     assert response.status_code == 404
